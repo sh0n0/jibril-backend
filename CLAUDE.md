@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-This is a `uv` project (`uv init --package`) using Django as the web framework with Django REST Framework (`rest_framework` in `INSTALLED_APPS`; typed via `djangorestframework-stubs`), with no Django apps yet — only the project-level config from `startproject`. Ruff is the linter/formatter (configured under `[tool.ruff]` in `pyproject.toml`). mypy (strict) with the django-stubs plugin is the type checker (`[tool.mypy]` / `[tool.django-stubs]` in `pyproject.toml`); the plugin loads `jibril_backend.settings`, so settings must stay importable for type checking to work. No test runner has been chosen yet — check `pyproject.toml` before assuming any tooling exists, and update this file once those choices are made.
+This is a `uv` project (`uv init --package`) using Django as the web framework with Django REST Framework (`rest_framework` in `INSTALLED_APPS`; typed via `djangorestframework-stubs`). Elasticsearch (run via `compose.yaml`) holds the [OANC](https://anc.org/data/oanc/) corpus, indexed one document per sentence. Ruff is the linter/formatter (configured under `[tool.ruff]` in `pyproject.toml`). mypy (strict) with the django-stubs plugin is the type checker (`[tool.mypy]` / `[tool.django-stubs]` in `pyproject.toml`); the plugin loads `jibril_backend.settings`, so settings must stay importable for type checking to work. No test runner has been chosen yet — check `pyproject.toml` before assuming any tooling exists, and update this file once those choices are made.
 
 ## Commands
 
@@ -19,6 +19,9 @@ uv add --dev <pkg>           # add a dev dependency (e.g. pytest)
 uv run ruff check .          # lint (add --fix to auto-fix)
 uv run ruff format .         # format
 uv run mypy .                # type check (strict, django-stubs plugin)
+cp .env.example .env         # then set ELASTIC_PASSWORD (Django and compose both read .env)
+docker compose up -d         # Elasticsearch on 127.0.0.1:9200 (security on, no TLS)
+uv run jibril-backend index_oanc [path] [--recreate] [--limit N]  # index OANC (default path data/OANC/data)
 ```
 
 ## Layout
@@ -26,4 +29,7 @@ uv run mypy .                # type check (strict, django-stubs plugin)
 - `src/` layout: the importable package is `jibril_backend` under `src/`, built with the `uv_build` backend.
 - Django project config lives directly in the package: `src/jibril_backend/{settings,urls,asgi,wsgi}.py` (`DJANGO_SETTINGS_MODULE=jibril_backend.settings`). `BASE_DIR` in `settings.py` is the repo root (three `.parent`s up), so `db.sqlite3` is created there (gitignored).
 - `jibril_backend:main` in `__init__.py` is Django's `execute_from_command_line`; both the `jibril-backend` console script (`[project.scripts]`) and the root `manage.py` call it. Keep that entry point valid (or update it) when restructuring.
+- `src/jibril_backend/corpus/` is the only app (no models — everything lives in Elasticsearch): `oanc.py` reads the corpus, `search.py` holds the index mapping and client, `management/commands/index_oanc.py` bulk-indexes, and `views.py` serves `GET /api/oanc/sentences/search/`. Changing the mapping in `search.py` requires re-running `index_oanc --recreate`.
+- OANC source: the `OANC-1.0.1-UTF8.zip` release linked from https://anc.org/data/oanc/download/, unpacked into `data/` (gitignored, ~3.3GB). Each document is `<name>.txt` plus stand-off annotations; sentence boundaries come from `<name>-s.xml` (character offsets into the `.txt`) and metadata from `<name>.anc`. The first path component gives `mode` (written/spoken), the next two `genre` and `source`.
+- Settings read `.env` at the repo root via python-dotenv.
 - `settings.py` is still the `startproject` default (`DEBUG = True`, hardcoded insecure `SECRET_KEY`) — not production-ready.
