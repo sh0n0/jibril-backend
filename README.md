@@ -17,6 +17,14 @@ uv run jibril-backend index_oanc --recreate
 uv run jibril-backend runserver
 ```
 
+### Kibana (local only)
+
+```sh
+docker compose --profile kibana up -d
+```
+
+Open http://localhost:5601 and log in as `elastic` with `ELASTIC_PASSWORD`. Kibana is behind a Compose profile so the VPS, which runs a plain `docker compose up -d`, never starts it.
+
 ## API
 
 `GET /api/oanc/sentences/search/`

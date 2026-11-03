@@ -21,6 +21,7 @@ uv run ruff format .         # format
 uv run mypy .                # type check (strict, django-stubs plugin)
 cp .env.example .env         # then set ELASTIC_PASSWORD (Django and compose both read .env)
 docker compose up -d         # Elasticsearch on 127.0.0.1:9200 (security on, no TLS)
+docker compose --profile kibana up -d  # also Kibana on 127.0.0.1:5601 — local dev only, never on the VPS
 uv run jibril-backend index_oanc [path] [--recreate] [--limit N]  # index OANC (default path data/OANC/data)
 ```
 
