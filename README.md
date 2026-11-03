@@ -1,6 +1,6 @@
 # jibril-backend
 
-Django + DRF API for searching the [Open American National Corpus (OANC)](https://anc.org/data/oanc/) and a Reddit sample ([ConvoKit](https://convokit.cornell.edu/) `reddit-corpus-small`) with Elasticsearch.
+Django + DRF API for searching the [Open American National Corpus (OANC)](https://anc.org/data/oanc/) and Reddit ([ConvoKit](https://convokit.cornell.edu/) subreddit corpora, up to Oct 2018) with Elasticsearch.
 
 ## Setup
 
@@ -15,11 +15,8 @@ unzip OANC-1.0.1-UTF8.zip && cd ..
 
 uv run jibril-backend index_oanc --recreate
 
-mkdir -p data/reddit && cd data/reddit
-curl -LO https://zissou.infosci.cornell.edu/convokit/datasets/subreddit-corpus/reddit-corpus-small.corpus.zip
-unzip reddit-corpus-small.corpus.zip && cd ../..
-
-uv run jibril-backend index_reddit --recreate
+# Downloads into data/reddit/<Subreddit>/; add more subreddits by re-running without --recreate
+uv run jibril-backend index_reddit AskAnAmerican --comments-only --recreate
 uv run jibril-backend runserver
 ```
 
@@ -52,7 +49,7 @@ The response includes `total`, `results` (sentence, metadata, highlighted text) 
 
 ### `GET /api/reddit/comments/search/`
 
-Reddit (100 subreddits, September 2018), one result per post or comment. Usernames are not included.
+Reddit (currently r/AskAnAmerican comments), one result per comment or post. Usernames are not included.
 
 | param | |
 |---|---|
