@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-This is a `uv` project (`uv init --package`) using Django as the web framework, with no Django apps yet — only the project-level config from `startproject`. Ruff is the linter/formatter (configured under `[tool.ruff]` in `pyproject.toml`). No test runner has been chosen yet — check `pyproject.toml` before assuming any tooling exists, and update this file once those choices are made.
+This is a `uv` project (`uv init --package`) using Django as the web framework, with no Django apps yet — only the project-level config from `startproject`. Ruff is the linter/formatter (configured under `[tool.ruff]` in `pyproject.toml`). mypy (strict) with the django-stubs plugin is the type checker (`[tool.mypy]` / `[tool.django-stubs]` in `pyproject.toml`); the plugin loads `jibril_backend.settings`, so settings must stay importable for type checking to work. No test runner has been chosen yet — check `pyproject.toml` before assuming any tooling exists, and update this file once those choices are made.
 
 ## Commands
 
@@ -18,6 +18,7 @@ uv add <pkg>                 # add a runtime dependency
 uv add --dev <pkg>           # add a dev dependency (e.g. pytest)
 uv run ruff check .          # lint (add --fix to auto-fix)
 uv run ruff format .         # format
+uv run mypy .                # type check (strict, django-stubs plugin)
 ```
 
 ## Layout
