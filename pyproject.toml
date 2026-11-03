@@ -6,8 +6,10 @@ readme = "README.md"
 authors = [
     { name = "sh0n0", email = "44708388+sh0n0@users.noreply.github.com" }
 ]
-requires-python = ">=3.10"
-dependencies = []
+requires-python = ">=3.12"
+dependencies = [
+    "django>=6.1.2",
+]
 
 [project.scripts]
 jibril-backend = "jibril_backend:main"
