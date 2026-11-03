@@ -17,6 +17,7 @@ uv run jibril-backend index_oanc --recreate
 
 # Downloads into data/reddit/<Subreddit>/; add more subreddits by re-running without --recreate
 uv run jibril-backend index_reddit AskAnAmerican --comments-only --recreate
+uv run jibril-backend index_reddit socialskills relationship_advice AskWomen AskMen
 uv run jibril-backend runserver
 ```
 
@@ -49,7 +50,7 @@ The response includes `total`, `results` (sentence, metadata, highlighted text) 
 
 ### `GET /api/reddit/comments/search/`
 
-Reddit (currently r/AskAnAmerican comments), one result per comment or post. Usernames are not included.
+Reddit, one result per comment or post: r/AskAnAmerican (comments only), r/socialskills, r/relationship_advice, r/AskWomen and r/AskMen (posts and comments). Usernames are not included.
 
 | param | |
 |---|---|
