@@ -142,7 +142,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "jibril API",
-    "DESCRIPTION": "Search the Open American National Corpus (OANC).",
+    "DESCRIPTION": "Search the Open American National Corpus (OANC) and Reddit.",
     "VERSION": "0.1.0",
 }
 
@@ -152,3 +152,4 @@ ELASTICSEARCH_URL = os.environ.get("ELASTICSEARCH_URL", "http://localhost:9200")
 ELASTICSEARCH_USERNAME = os.environ.get("ELASTICSEARCH_USERNAME", "elastic")
 ELASTICSEARCH_PASSWORD = os.environ.get("ELASTIC_PASSWORD", "")
 OANC_INDEX = os.environ.get("OANC_INDEX", "oanc")
+REDDIT_INDEX = os.environ.get("REDDIT_INDEX", "reddit")

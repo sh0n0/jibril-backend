@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError, CommandParser
 from elasticsearch import helpers
 
 from jibril_backend.corpus.oanc import find_documents, read_sentences
-from jibril_backend.corpus.search import INDEX_MAPPINGS, INDEX_SETTINGS, get_client
+from jibril_backend.corpus.search import OANC_MAPPINGS, ensure_index, get_client
 
 
 class Command(BaseCommand):
@@ -37,12 +37,7 @@ class Command(BaseCommand):
 
         client = get_client()
         index = settings.OANC_INDEX
-        if options["recreate"]:
-            client.indices.delete(index=index, ignore_unavailable=True)
-        if not client.indices.exists(index=index):
-            client.indices.create(
-                index=index, settings=INDEX_SETTINGS, mappings=INDEX_MAPPINGS
-            )
+        ensure_index(client, index, OANC_MAPPINGS, recreate=options["recreate"])
 
         documents = list(find_documents(root))[: options["limit"]]
 

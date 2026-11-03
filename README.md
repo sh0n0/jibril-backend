@@ -1,6 +1,6 @@
 # jibril-backend
 
-Django + DRF API for searching the [Open American National Corpus (OANC)](https://anc.org/data/oanc/) with Elasticsearch.
+Django + DRF API for searching the [Open American National Corpus (OANC)](https://anc.org/data/oanc/) and a Reddit sample ([ConvoKit](https://convokit.cornell.edu/) `reddit-corpus-small`) with Elasticsearch.
 
 ## Setup
 
@@ -14,6 +14,12 @@ curl -LO https://github.com/nancyide/anc-website/releases/download/datasets-2026
 unzip OANC-1.0.1-UTF8.zip && cd ..
 
 uv run jibril-backend index_oanc --recreate
+
+mkdir -p data/reddit && cd data/reddit
+curl -LO https://zissou.infosci.cornell.edu/convokit/datasets/subreddit-corpus/reddit-corpus-small.corpus.zip
+unzip reddit-corpus-small.corpus.zip && cd ../..
+
+uv run jibril-backend index_reddit --recreate
 uv run jibril-backend runserver
 ```
 
@@ -29,7 +35,9 @@ Open http://localhost:5601 and log in as `elastic` with `ELASTIC_PASSWORD`. Kiba
 
 Interactive docs: http://localhost:8000/api/docs/ (Swagger UI), `/api/redoc/`, raw schema at `/api/schema/`.
 
-`GET /api/oanc/sentences/search/`
+### `GET /api/oanc/sentences/search/`
+
+OANC, one result per sentence.
 
 | param | |
 |---|---|
@@ -41,3 +49,17 @@ Interactive docs: http://localhost:8000/api/docs/ (Swagger UI), `/api/redoc/`, r
 | `size`, `offset` | paging (max 100 per page) |
 
 The response includes `total`, `results` (sentence, metadata, highlighted text) and `facets` (counts per mode/genre/source).
+
+### `GET /api/reddit/comments/search/`
+
+Reddit (100 subreddits, September 2018), one result per post or comment. Usernames are not included.
+
+| param | |
+|---|---|
+| `q`, `stem`, `size`, `offset` | as above |
+| `subreddit` | e.g. `AskReddit`, `programming` |
+| `kind` | `post` / `comment` |
+| `min_score` | minimum Reddit score |
+| `sort` | `relevance` (default) / `score` / `new` |
+
+The response includes `total`, `results` (text, highlight, subreddit, thread title, score, date, permalink) and `facets` (counts per subreddit).
