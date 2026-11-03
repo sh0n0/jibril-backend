@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "django>=6.1.2",
+    "djangorestframework>=3.18.3",
 ]
 
 [project.scripts]
@@ -21,6 +22,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "django-stubs[compatible-mypy]>=6.1.2",
+    "djangorestframework-stubs[compatible-mypy]>=3.18.2",
     "mypy>=2.4.1",
     "ruff>=0.17.3",
 ]
