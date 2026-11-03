@@ -22,6 +22,7 @@ uv run mypy .                # type check (strict, django-stubs plugin)
 cp .env.example .env         # then set ELASTIC_PASSWORD (Django and compose both read .env)
 docker compose up -d         # Elasticsearch on 127.0.0.1:9200 (security on, no TLS)
 docker compose --profile kibana up -d  # also Kibana on 127.0.0.1:5601 — local dev only, never on the VPS
+uv run jibril-backend spectacular --validate --file openapi.yaml  # dump OpenAPI (not committed; served at /api/schema/)
 uv run jibril-backend index_oanc [path] [--recreate] [--limit N]  # index OANC (default path data/OANC/data)
 ```
 
@@ -30,7 +31,7 @@ uv run jibril-backend index_oanc [path] [--recreate] [--limit N]  # index OANC (
 - `src/` layout: the importable package is `jibril_backend` under `src/`, built with the `uv_build` backend.
 - Django project config lives directly in the package: `src/jibril_backend/{settings,urls,asgi,wsgi}.py` (`DJANGO_SETTINGS_MODULE=jibril_backend.settings`). `BASE_DIR` in `settings.py` is the repo root (three `.parent`s up), so `db.sqlite3` is created there (gitignored).
 - `jibril_backend:main` in `__init__.py` is Django's `execute_from_command_line`; both the `jibril-backend` console script (`[project.scripts]`) and the root `manage.py` call it. Keep that entry point valid (or update it) when restructuring.
-- `src/jibril_backend/corpus/` is the only app (no models — everything lives in Elasticsearch): `oanc.py` reads the corpus, `search.py` holds the index mapping and client, `management/commands/index_oanc.py` bulk-indexes, and `views.py` serves `GET /api/oanc/sentences/search/`. Changing the mapping in `search.py` requires re-running `index_oanc --recreate`.
+- `src/jibril_backend/corpus/` is the only app (no models — everything lives in Elasticsearch): `oanc.py` reads the corpus, `search.py` holds the index mapping and client, `management/commands/index_oanc.py` bulk-indexes, and `views.py` serves `GET /api/oanc/sentences/search/`. OpenAPI comes from drf-spectacular (`/api/schema/`, Swagger UI at `/api/docs/`, ReDoc at `/api/redoc/`): views must declare their query params and responses with `@extend_schema` using the serializers in `serializers.py`, and should render responses through those serializers so the schema can't drift. A serializer field named `source` can't be a class attribute (it shadows `Field.source`) — build such fields in `get_fields()`, or rename the query param (hence `subcorpus`). Changing the mapping in `search.py` requires re-running `index_oanc --recreate`.
 - OANC source: the `OANC-1.0.1-UTF8.zip` release linked from https://anc.org/data/oanc/download/, unpacked into `data/` (gitignored, ~3.3GB). Each document is `<name>.txt` plus stand-off annotations; sentence boundaries come from `<name>-s.xml` (character offsets into the `.txt`) and metadata from `<name>.anc`. The first path component gives `mode` (written/spoken), the next two `genre` and `source`.
 - Settings read `.env` at the repo root via python-dotenv.
 - `settings.py` is still the `startproject` default (`DEBUG = True`, hardcoded insecure `SECRET_KEY`) — not production-ready.

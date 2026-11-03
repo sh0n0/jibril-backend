@@ -1,12 +1,16 @@
 from typing import Any
 
 from django.conf import settings
+from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jibril_backend.corpus.search import get_client
-from jibril_backend.corpus.serializers import SearchQuerySerializer
+from jibril_backend.corpus.serializers import (
+    SearchQuerySerializer,
+    SearchResultSerializer,
+)
 
 FACETS = ("mode", "genre", "source")
 # Query parameter -> indexed field.
@@ -20,6 +24,7 @@ class SentenceSearchView(APIView):
     ``+must``, ``-not``, ``prefix*``.
     """
 
+    @extend_schema(parameters=[SearchQuerySerializer], responses=SearchResultSerializer)
     def get(self, request: Request) -> Response:
         params = SearchQuerySerializer(data=request.query_params)
         params.is_valid(raise_exception=True)
@@ -48,7 +53,7 @@ class SentenceSearchView(APIView):
             track_total_hits=True,
         )
 
-        return Response(
+        response = SearchResultSerializer(
             {
                 "total": result["hits"]["total"]["value"],
                 "results": [
@@ -67,3 +72,4 @@ class SentenceSearchView(APIView):
                 },
             }
         )
+        return Response(response.data)

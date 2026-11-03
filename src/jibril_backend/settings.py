@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_spectacular",
     "jibril_backend.corpus",
 ]
 
@@ -131,6 +132,18 @@ MAILERS = {
     "default": {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
+}
+
+# Django REST Framework / OpenAPI
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "jibril API",
+    "DESCRIPTION": "Search the Open American National Corpus (OANC).",
+    "VERSION": "0.1.0",
 }
 
 # Elasticsearch

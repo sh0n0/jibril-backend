@@ -27,6 +27,8 @@ Open http://localhost:5601 and log in as `elastic` with `ELASTIC_PASSWORD`. Kiba
 
 ## API
 
+Interactive docs: http://localhost:8000/api/docs/ (Swagger UI), `/api/redoc/`, raw schema at `/api/schema/`.
+
 `GET /api/oanc/sentences/search/`
 
 | param | |

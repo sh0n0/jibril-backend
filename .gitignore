@@ -15,3 +15,4 @@ db.sqlite3
 # Corpus data (downloaded, not versioned)
 /data/
 .env
+openapi.yaml
